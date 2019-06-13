@@ -1,0 +1,27 @@
+version: '3'
+services:
+  nginx:
+    image: nginx:alpine
+    depends_on:
+      - wpsite1
+    ports:
+      - '80:80'
+    volumes:
+      - ./site1:/var/www/html/site1:z
+      - ./nginx/site1.conf:/etc/nginx/conf.d/default.conf:z
+
+  wpsite1:
+    image: wordpress:5.2.1-php7.1-fpm-alpine
+    user: '${UID}:${GID}'
+    restart: always
+    volumes:
+      - ./site1:/var/www/html/site1:z
+
+  mysql:
+    image: mysql:latest
+    volumes:
+      - ./mysql/my.cnf:/etc/mysql/conf.d/mysql.cnf:z
+      - .data:/var/lib/mysql:z
+    environment:
+      MYSQL_DATABASE: site1
+      MYSQL_ROOT_PASSWORD: 'root'
