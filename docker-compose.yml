@@ -16,6 +16,13 @@ services:
     restart: always
     volumes:
       - ./site1:/var/www/html/site1:z
+    environment:
+      WORDPRESS_SMTP_HOST: smtp.sendgrid.net
+      WORDPRESS_SMTP_PORT: 2525
+      WORDPRESS_SMTP_USERNAME: '${SendGrid_User}'
+      WORDPRESS_SMTP_PASSWORD: '${SendGrid_Pass}'
+      WORDPRESS_SMTP_FROM: '${SendGrid_FromMail}'
+      WORDPRESS_SMTP_FROM_NAME: '${SendGrid_FromName}'
 
   mysql:
     image: mysql:latest

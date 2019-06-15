@@ -46,6 +46,16 @@ $ vim docker-compose.yml
   wpsite1:
     image: wordpress:5.2.1-php7.1-fpm-alpine
     user: '{UID}:{GID}' # modify
+    restart: always
+    volumes:
+      - ./site1:/var/www/html/site1:z
+    environment:
+      WORDPRESS_SMTP_HOST: smtp.sendgrid.net
+      WORDPRESS_SMTP_PORT: 2525
+      WORDPRESS_SMTP_USERNAME: '${SendGrid_User}'       # modify
+      WORDPRESS_SMTP_PASSWORD: '${SendGrid_Pass}'       # modify
+      WORDPRESS_SMTP_FROM: '${SendGrid_FromMail}'       # modify
+      WORDPRESS_SMTP_FROM_NAME: '${SendGrid_FromName}'  # modify
 
 ```
 
@@ -53,4 +63,27 @@ $ vim docker-compose.yml
 
 ```
 $ docker-compose up -d --build
+```
+
+7. After install wordpress
+
+modify wp-config.php
+
+```
+# Add these lines
+add_action( 'phpmailer_init', 'mail_smtp' );
+function mail_smtp( $phpmailer ) {
+  $phpmailer->isSMTP();
+  $phpmailer->Host = getenv('WORDPRESS_SMTP_HOST');
+  $phpmailer->SMTPAutoTLS = true;
+  $phpmailer->SMTPAuth = true;
+  $phpmailer->Port = getenv('WORDPRESS_SMTP_PORT');
+  $phpmailer->Username = getenv('WORDPRESS_SMTP_USERNAME');
+  $phpmailer->Password = getenv('WORDPRESS_SMTP_PASSWORD');
+
+  // Additional settings
+  $phpmailer->SMTPSecure = "tls";
+  $phpmailer->From = getenv('WORDPRESS_SMTP_FROM');
+  $phpmailer->FromName = getenv('WORDPRESS_SMTP_FROM_NAME');
+}
 ```
